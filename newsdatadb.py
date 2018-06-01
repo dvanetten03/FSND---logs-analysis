@@ -7,15 +7,23 @@ import psycopg2
 
 q1 = """
 SELECT title, count(*) AS views FROM articles 
-INNER JOIN log ON path LIKE '%' || articles.slug || '%' 
+JOIN log ON path LIKE '%' || articles.slug || '%' 
 WHERE log.status LIKE '%200%' GROUP BY title, path 
-ORDER BY views DESC limit 3;"""
+ORDER BY views DESC limit 3;
+"""
 
 q2 = """
-SELECT authors.name, count(*) AS views FROM articles 
-INNER JOIN authors ON articles.author = authors.id 
-INNER JOIN log ON concat('/article/', articles.slug) = log.path 
-WHERE log.status LIKE '%200%' GROUP BY authors.name ORDER BY views;
+SELECT authors.name, count(*) AS views FROM articles  
+JOIN authors ON articles.author = authors.id 
+JOIN log ON concat('/article/', articles.slug) = log.path 
+WHERE log.status LIKE '%200%' GROUP BY authors.name ORDER BY views DESC;
+"""
+
+q3 = """
+SELECT total.day AS "Days with more than 1 percent errors", ROUND(cast(error.totalError AS decimal)/cast(total.total AS decimal)*100,2) 
+FROM (SELECT date(log.time) AS day, count(*) AS total FROM log GROUP BY day) AS total 
+LEFT JOIN (SELECT date(log.time) AS day, count(*) AS totalError FROM log WHERE status LIKE '%404%' 
+GROUP BY day) AS error ON total.day = error.day WHERE (error.totalError*100)/total.total >= 1 ORDER BY total.day;
 """
 
 
