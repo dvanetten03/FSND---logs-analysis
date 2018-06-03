@@ -3,7 +3,7 @@
 ##### The Backend: Databases and Applications
 
 ##### Background
-This application is an internal reporting tool that uses info from the database to discover what kind of articles the site's readers like.
+This application is an internal reporting tool that uses info from the newspaper's database to discover what kind of articles the site's readers like.
 
 The database containes newspaper articles as well as the web server log for the site. The log has a database row for each time a reader loaded a web page. It's this information that is used to answer the following questions:
 
@@ -33,6 +33,8 @@ psql -d news -f newsdata.sql
 Then run the following:
 
 python newsdata.py
+
+The output will be displayed on the terminal screen.
 
 
     
