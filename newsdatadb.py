@@ -3,6 +3,8 @@
 
 import psycopg2
 
+DBNAME = "news"
+
 # Queries
 
 q1 = """
@@ -27,14 +29,30 @@ GROUP BY day) AS error ON total.day = error.day WHERE (error.totalError*100)/tot
 """
 
 
-DBNAME = "newsdata"
+db = psycopg2.connect(database=DBNAME)
+c = db.cursor()
+c.execute(q1)
+top_arts = c.fetchall()
+	
+c.execute(q2)
+pop_auth = c.fetchall()
+	
 
-def get_posts():
-	db = psycopg2.connect(database=DBNAME)
-	c = db.cursor()
-	c.execute("select count(*) from log group by DATE(time)")
-	posts = c.fetchall()
-	db.close()
-	return posts
+c.execute(q3)
+err_rate = c.fetchall()
 
-	print( "There are " + posts + " different days in this database ");
+db.close()
+
+print("1. What are the three most popular articles?")
+for row in top_arts:
+	print('\t"{}" - {} views'.format(row[0], row[1]))
+
+print("\n2. Who are the most popular article authors?")
+for row in pop_auth:
+	print('\t"{}" - {} views'.format(row[0], row[1]))
+
+print("\n3. On which days did more than 1% of requests lead to errors?")
+for row in err_rate:
+	print('\t"{}"'.format(row[0]))
+
+
